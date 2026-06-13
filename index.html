@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- iOS Web App Status Bar Fixes -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f4f6">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111827">
+
     <title>Run Route Finder</title>
     
     <!-- App Icons -->
@@ -82,6 +89,12 @@
         /* Hide scrollbar for POI list */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Custom Colorful Dark Theme Filter */
+        .theme-neon {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+            -webkit-filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
 
         @media (prefers-color-scheme: dark) {
             input[type=range]::-webkit-slider-runnable-track { background: #374151; }
@@ -188,15 +201,6 @@
             <!-- Settings Tab Content -->
             <div id="content-settings" class="hidden">
                 
-                <!-- Unit Config -->
-                <div class="mb-5">
-                    <label class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 block">Measurement Units</label>
-                    <select id="unit-select" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
-                        <option value="mi">Imperial (Miles / Feet)</option>
-                        <option value="km">Metric (Kilometers / Meters)</option>
-                    </select>
-                </div>
-
                 <!-- Loop Settings Toggle -->
                 <div class="flex items-center justify-between mb-5 bg-gray-50 dark:bg-gray-800/50 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-700">
                     <div>
@@ -210,6 +214,45 @@
                     </div>
                 </div>
 
+                <!-- Avoid Segments -->
+                <div class="mb-5">
+                    <label class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 block">Avoid on Route</label>
+                    <div class="grid grid-cols-2 gap-y-3 gap-x-2 bg-gray-50 dark:bg-gray-800/50 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-700">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" value="motorway" class="avoid-cb h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Highways</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" value="primary" class="avoid-cb h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Busy Roads</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" value="unpaved" class="avoid-cb h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Unpaved</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" value="track" class="avoid-cb h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Trails / Dirt</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" value="steps" class="avoid-cb h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Steps</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" value="construction" class="avoid-cb h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Construction</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" value="toll" class="avoid-cb h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Tolls</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" value="ferry" class="avoid-cb h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Ferries</span>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Map Theme Selector -->
                 <div class="mb-5">
                     <label class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 block">Map Theme</label>
@@ -217,7 +260,8 @@
                         <option value="voyager">Standard (Light)</option>
                         <option value="osm">High Contrast (Day)</option>
                         <option value="hot">Humanitarian (Detailed)</option>
-                        <option value="dark">Dark Matter</option>
+                        <option value="neon">Vibrant Night (Color Dark)</option>
+                        <option value="dark">Dark Matter (Muted Night)</option>
                         <option value="topo">Topographical</option>
                         <option value="satellite">Satellite</option>
                     </select>
@@ -238,6 +282,15 @@
                             <input type="number" id="variance-max" value="1.0" min="0" step="0.1" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
                         </div>
                     </div>
+                </div>
+
+                <!-- Unit Config (Moved to bottom) -->
+                <div class="mb-5">
+                    <label class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 block">Measurement Units</label>
+                    <select id="unit-select" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                        <option value="mi">Imperial (Miles / Feet)</option>
+                        <option value="km">Metric (Kilometers / Meters)</option>
+                    </select>
                 </div>
 
                 <hr class="border-gray-200 dark:border-gray-700 my-6">
@@ -332,35 +385,41 @@
         const EARTH_RADIUS_M = 6371e3;
 
         const tileLayers = {
-            'voyager': 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-            'osm': 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            'hot': 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-            'dark': 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-            'satellite': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            'topo': 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+            'voyager': { url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', class: '' },
+            'osm': { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', class: '' },
+            'hot': { url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', class: '' },
+            'dark': { url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', class: '' },
+            'neon': { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', class: 'theme-neon' }, // Inverted OSM
+            'satellite': { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', class: '' },
+            'topo': { url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', class: '' }
         };
+
+        // Initialize Chart.js global text color for dark mode
+        Chart.defaults.color = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#9ca3af' : '#6b7280';
 
         // Init App and Map Setup
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([42.24, -71.17], 13);
             
-            // Apply text colors for elevation chart based on user's theme preference
-            Chart.defaults.color = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#9ca3af' : '#6b7280';
-            
-            // Auto-set initial map theme based on system setting if possible
+            // Auto-set initial map theme based on system setting
             const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const initialTheme = prefersDark ? 'dark' : 'voyager';
+            const initialTheme = prefersDark ? 'neon' : 'voyager';
             mapThemeSelect.value = initialTheme;
 
-            currentTileLayer = L.tileLayer(tileLayers[initialTheme], {
+            currentTileLayer = L.tileLayer(tileLayers[initialTheme].url, {
                 attribution: '&copy; OpenStreetMap contributors',
-                maxZoom: initialTheme === 'topo' ? 17 : 19
+                maxZoom: initialTheme === 'topo' ? 17 : 19,
+                className: tileLayers[initialTheme].class
             }).addTo(map);
 
             // Listen for system theme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
                 Chart.defaults.color = e.matches ? '#9ca3af' : '#6b7280';
                 if (elevationChart) elevationChart.update();
+                
+                const newTheme = e.matches ? 'neon' : 'voyager';
+                mapThemeSelect.value = newTheme;
+                mapThemeSelect.dispatchEvent(new Event('change'));
             });
 
             map.on('click', (e) => {
@@ -410,8 +469,9 @@
             const theme = e.target.value;
             const maxZoom = theme === 'topo' ? 17 : 19;
             
-            currentTileLayer = L.tileLayer(tileLayers[theme], {
-                maxZoom: maxZoom
+            currentTileLayer = L.tileLayer(tileLayers[theme].url, {
+                maxZoom: maxZoom,
+                className: tileLayers[theme].class
             }).addTo(map);
         });
 
@@ -601,6 +661,10 @@
             
             const minAllowed = Math.max(0.1, targetDistance - parseFloat(varianceMin.value));
             const maxAllowed = targetDistance + parseFloat(varianceMax.value);
+            
+            // Get selected avoid parameters
+            const avoidClasses = Array.from(document.querySelectorAll('.avoid-cb:checked')).map(cb => cb.value);
+            const excludeParam = avoidClasses.length > 0 ? `&exclude=${avoidClasses.join(',')}` : '';
 
             btnGenerate.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating...`;
             btnGenerate.disabled = true;
@@ -640,10 +704,18 @@
                     }
 
                     const coordString = waypoints.map(wp => `${wp[0]},${wp[1]}`).join(';');
-                    const url = `https://router.project-osrm.org/route/v1/foot/${coordString}?overview=full&geometries=geojson`;
+                    let url = `https://router.project-osrm.org/route/v1/foot/${coordString}?overview=full&geometries=geojson${excludeParam}`;
 
-                    const response = await fetch(url);
-                    const data = await response.json();
+                    let response = await fetch(url);
+                    let data = await response.json();
+
+                    // Fallback if public server rejects avoid parameters for this region/profile
+                    if (data.code === 'InvalidValue' || (data.message && data.message.includes('exclude'))) {
+                        if (i === 0) showStatus("Avoid settings not supported here. Using standard route.", true);
+                        url = `https://router.project-osrm.org/route/v1/foot/${coordString}?overview=full&geometries=geojson`;
+                        response = await fetch(url);
+                        data = await response.json();
+                    }
 
                     if (data.code !== 'Ok') throw new Error("OSRM Routing failure.");
                     
