@@ -68,20 +68,15 @@
             transition: all 0.2s ease;
         }
 
-        /* Lock html/body to fixed size to prevent mobile browser drag/bounce and PWA resize black bars on resume */
+        /* Use dynamic viewport height to fill screen without JS resizing bugs */
         html, body { 
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
             width: 100%; 
-            height: 100%; 
+            height: 100vh;
+            height: 100dvh; 
             margin: 0; 
             padding: 0; 
-            background-color: #000; 
             overflow: hidden; 
-            -webkit-overflow-scrolling: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         /* Dynamic iOS safe area subtraction to pull button closer to Home Indicator bar */
@@ -117,7 +112,7 @@
         }
     </style>
 </head>
-<body class="overflow-hidden bg-black font-sans text-gray-900 dark:text-gray-100 antialiased">
+<body class="overflow-hidden bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 antialiased">
 
     <!-- Map Area -->
     <div id="map" class="fixed inset-0 z-0 h-full w-full"></div>
@@ -399,35 +394,6 @@
             'topo': { url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', class: '' }
         };
 
-        // Resets layout dimensions to prevent viewport black bars
-        function forceViewportFix() {
-            window.scrollTo(0, 0);
-            
-            // Re-apply explicit constraints based on actual window height
-            const currentHeight = window.innerHeight;
-            document.documentElement.style.height = currentHeight + 'px';
-            document.body.style.height = currentHeight + 'px';
-            
-            const mapContainer = document.getElementById('map');
-            if (mapContainer) {
-                mapContainer.style.height = currentHeight + 'px';
-            }
-            
-            setTimeout(() => {
-                window.scrollTo(0, 0);
-                if (map) {
-                    map.invalidateSize();
-                }
-            }, 150);
-        }
-        window.addEventListener('resize', forceViewportFix);
-        window.addEventListener('focus', forceViewportFix);
-        window.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                forceViewportFix();
-            }
-        });
-
         // Initialize Chart.js global text color for dark mode
         Chart.defaults.color = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#9ca3af' : '#6b7280';
 
@@ -466,7 +432,6 @@
             });
 
             getUserLocation();
-            forceViewportFix();
         }
 
         // Tab Navigation Logic
