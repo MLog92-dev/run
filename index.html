@@ -86,8 +86,9 @@
             touch-action: none; /* Disables overscroll bounce that reveals gaps */
         }
 
-        /* Prevent WebKit/Safari from stretching the fixed control panel flexbox */
+        /* Prevent WebKit/Safari from stretching the fixed control panel flexbox and position it snugly */
         #control-panel {
+            bottom: calc(16px - env(safe-area-inset-bottom, 0px)) !important;
             height: -webkit-fit-content !important;
             height: fit-content !important;
         }
