@@ -68,21 +68,20 @@
             transition: all 0.2s ease;
         }
 
-        /* Resolves iOS PWA viewport height calculation bugs (prevents the black/grey bar on reload) */
-        html {
-            height: -webkit-fill-available;
-            background-color: #000;
-        }
-        
-        body { 
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-            width: 100%; 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
+        /* Resolves iOS PWA viewport bounds to stretch completely behind the home indicator */
+        html, body {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             -webkit-overflow-scrolling: touch;
-            background-color: #000;
+            background-color: #f3f4f6; /* Light mode base background */
         }
 
         /* Hide default number input arrows */
@@ -106,6 +105,7 @@
         }
 
         @media (prefers-color-scheme: dark) {
+            html, body { background-color: #111827; /* Dark mode base background */ }
             input[type=range]::-webkit-slider-runnable-track { background: #374151; }
             input[type=range]::-webkit-slider-thumb { background: #d1d5db; }
             .toggle-checkbox { border-color: #4b5563; }
