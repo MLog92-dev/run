@@ -88,7 +88,7 @@
 
         /* Safe area bottom padding that collapses snug on desktop but clears iOS home indicator */
         .pb-safe-bottom {
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            padding-bottom: max(12px, calc(env(safe-area-inset-bottom, 12px) - 14px));
         }
         
         #panel-content {
