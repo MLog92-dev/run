@@ -72,7 +72,7 @@
         
         /* Safe area handling for iOS */
         .controls-panel {
-            padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+            padding-bottom: env(safe-area-inset-bottom, 12px);
         }
 
         /* Hide default number input arrows */
@@ -253,16 +253,22 @@
                 <!-- Distance Limits & Variance -->
                 <div class="mb-5">
                     <label class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 block">Slider Maximum Limit (<span class="unit-label">mi</span>)</label>
-                    <input type="number" id="slider-max-input" value="21" min="1" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 mb-3">
+                    <input type="number" id="slider-max-input" value="21" min="1" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 mb-5">
                     
-                    <div class="flex gap-4">
-                        <div class="flex-1">
-                            <label class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1 block">Min Allowance (<span class="unit-label">mi</span>)</label>
-                            <input type="number" id="variance-min" value="1.0" min="0" step="0.1" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Min Allowance (<span class="unit-label">mi</span>)</label>
+                                <span id="variance-min-val" class="text-xs font-semibold text-blue-600 dark:text-blue-400">1.0</span>
+                            </div>
+                            <input type="range" id="variance-min" min="0" max="5" step="0.1" value="1.0">
                         </div>
-                        <div class="flex-1">
-                            <label class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1 block">Max Allowance (<span class="unit-label">mi</span>)</label>
-                            <input type="number" id="variance-max" value="1.0" min="0" step="0.1" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Max Allowance (<span class="unit-label">mi</span>)</label>
+                                <span id="variance-max-val" class="text-xs font-semibold text-blue-600 dark:text-blue-400">1.0</span>
+                            </div>
+                            <input type="range" id="variance-max" min="0" max="5" step="0.1" value="1.0">
                         </div>
                     </div>
                 </div>
@@ -293,7 +299,7 @@
         </div>
 
         <!-- Persistent Generate Button (Outside collapsible content) -->
-        <div class="px-6 pb-2 pt-2 bg-transparent shrink-0">
+        <div class="px-6 pb-4 pt-2 bg-transparent shrink-0">
             <button id="btn-generate" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-4 px-4 rounded-2xl shadow-lg transition duration-150 flex justify-center items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 Find Route
@@ -354,6 +360,8 @@
         const unitSelect = document.getElementById('unit-select');
         const varianceMin = document.getElementById('variance-min');
         const varianceMax = document.getElementById('variance-max');
+        const varianceMinVal = document.getElementById('variance-min-val');
+        const varianceMaxVal = document.getElementById('variance-max-val');
         const unitLabels = document.querySelectorAll('.unit-label');
         const elevUnitLabels = document.querySelectorAll('.elev-unit-label');
 
@@ -383,6 +391,9 @@
         // Init App and Map Setup
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([42.24, -71.17], 13);
+            
+            // Apply text colors for elevation chart based on user's theme preference
+            Chart.defaults.color = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#9ca3af' : '#6b7280';
             
             // Auto-set initial map theme based on system setting
             const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -491,6 +502,15 @@
             }
         });
 
+        // Sync Variance Sliders with value text
+        varianceMin.addEventListener('input', (e) => {
+            varianceMinVal.textContent = parseFloat(e.target.value).toFixed(1);
+        });
+
+        varianceMax.addEventListener('input', (e) => {
+            varianceMaxVal.textContent = parseFloat(e.target.value).toFixed(1);
+        });
+
         // Expand and Collapse UI Panel Drawer
         function togglePanel(forceState) {
             isPanelOpen = forceState !== undefined ? forceState : !isPanelOpen;
@@ -592,6 +612,7 @@
             }, 3500);
         }
 
+        // Acquire System GPS Signals
         function getUserLocation() {
             if (!navigator.geolocation) {
                 showStatus("GPS is unsupported in this browser.");
