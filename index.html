@@ -68,25 +68,21 @@
             transition: all 0.2s ease;
         }
 
-        /* Lock html/body to fixed corners to prevent mobile browser drag/bounce and resize black bars */
-        html, body { 
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+        /* Resolves iOS PWA viewport height calculation bugs (prevents the black/grey bar on reload) */
+        html {
+            height: -webkit-fill-available;
+            background-color: #000;
+        }
+        
+        body { 
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
             width: 100%; 
-            height: 100%; 
             margin: 0; 
             padding: 0; 
             overflow: hidden; 
             -webkit-overflow-scrolling: touch;
-            background-color: #f3f4f6; /* Light mode fallback background */
-        }
-        
-        /* Dynamic iOS safe area subtraction */
-        .controls-panel {
-            padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+            background-color: #000;
         }
 
         /* Hide default number input arrows */
@@ -110,7 +106,6 @@
         }
 
         @media (prefers-color-scheme: dark) {
-            html, body { background-color: #111827; /* Dark mode fallback background */ }
             input[type=range]::-webkit-slider-runnable-track { background: #374151; }
             input[type=range]::-webkit-slider-thumb { background: #d1d5db; }
             .toggle-checkbox { border-color: #4b5563; }
@@ -121,7 +116,7 @@
 <body class="overflow-hidden font-sans text-gray-900 dark:text-gray-100 antialiased">
 
     <!-- Map Area -->
-    <div id="map" class="fixed inset-0 z-0 h-full w-full"></div>
+    <div id="map" class="absolute inset-0 z-0 h-full w-full"></div>
 
     <!-- Notification / Status Banner -->
     <div id="status-bar" class="fixed top-[calc(1rem+env(safe-area-inset-top,0px))] left-4 right-4 z-20 flex justify-center pointer-events-none transition-all duration-300 opacity-0 transform -translate-y-2">
@@ -136,7 +131,7 @@
     </button>
 
     <!-- Slide-up Bottom Control Panel -->
-    <div id="control-panel" class="fixed bottom-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] controls-panel border-t border-gray-100 dark:border-gray-800 transition-all duration-300 transform translate-y-0 flex flex-col max-h-[82dvh]">
+    <div id="control-panel" class="absolute bottom-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 transform translate-y-0 flex flex-col max-h-[82dvh]">
         
         <!-- Toggle Header (Drag Bar and quick metrics) -->
         <div id="panel-header" class="pt-4 pb-2 px-6 cursor-pointer flex flex-col items-center shrink-0">
@@ -160,7 +155,7 @@
             </div>
         </div>
 
-        <!-- Main Form Fields (collapsible) - Removed flex-1 to prevent aggressive stretching -->
+        <!-- Main Form Fields (collapsible) -->
         <div id="panel-content" class="px-6 pb-2 overflow-y-auto transition-all duration-300 shrink min-h-0">
             
             <!-- Tab Navigation -->
@@ -313,8 +308,8 @@
             </div>
         </div>
 
-        <!-- Persistent Generate Button (Outside collapsible content, packed with tight bottom margins) -->
-        <div class="px-6 pb-2 pt-1 bg-transparent shrink-0">
+        <!-- Persistent Generate Button (Using explicit safe area padding directly on the wrapper) -->
+        <div class="px-6 pt-2 shrink-0 w-full" style="padding-bottom: max(12px, env(safe-area-inset-bottom));">
             <button id="btn-generate" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-4 px-4 rounded-2xl shadow-lg transition duration-150 flex justify-center items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 Find Route
@@ -1137,8 +1132,9 @@
                 } catch (e) { console.error(e); }
             }
 
+            // Using a query param forces iOS to pull a new version without executing standard reload bugs
             setTimeout(() => {
-                window.location.reload();
+                window.location.href = window.location.pathname + '?v=' + new Date().getTime();
             }, 500);
         });
 
