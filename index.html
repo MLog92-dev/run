@@ -68,8 +68,13 @@
             transition: all 0.2s ease;
         }
 
-        /* Resolves iOS PWA viewport bounds to stretch completely behind the home indicator */
+        /* Locks iOS PWA bounds directly to physical screen edges to prevent gap bugs */
         html, body {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
             height: 100%;
             margin: 0;
@@ -109,22 +114,22 @@
 <body class="overflow-hidden bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 antialiased">
 
     <!-- Map Area -->
-    <div id="map" class="fixed inset-0 z-0 h-full w-full"></div>
+    <div id="map" class="absolute inset-0 z-0 h-full w-full"></div>
 
     <!-- Notification / Status Banner -->
-    <div id="status-bar" class="fixed top-[calc(1rem+env(safe-area-inset-top,0px))] left-4 right-4 z-20 flex justify-center pointer-events-none transition-all duration-300 opacity-0 transform -translate-y-2">
+    <div id="status-bar" class="absolute top-[calc(1rem+env(safe-area-inset-top,0px))] left-4 right-4 z-20 flex justify-center pointer-events-none transition-all duration-300 opacity-0 transform -translate-y-2">
         <div id="status-message" class="bg-gray-900/95 dark:bg-gray-800/95 backdrop-blur text-white px-4 py-2.5 rounded-full text-sm font-medium shadow-lg pointer-events-auto">
             Status message
         </div>
     </div>
 
     <!-- Current Position/Recenter Button -->
-    <button id="btn-recenter" class="fixed top-[calc(1rem+env(safe-area-inset-top,0px))] right-4 z-10 bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-700 hidden transition-all">
+    <button id="btn-recenter" class="absolute top-[calc(1rem+env(safe-area-inset-top,0px))] right-4 z-10 bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-700 hidden transition-all">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
     </button>
 
     <!-- Slide-up Bottom Control Panel -->
-    <div id="control-panel" class="fixed bottom-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 transform translate-y-0 flex flex-col max-h-[82dvh]" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
+    <div id="control-panel" class="absolute bottom-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 transform translate-y-0 flex flex-col max-h-[82dvh]" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
         
         <!-- Toggle Header (Drag Bar and quick metrics) -->
         <div id="panel-header" class="pt-4 pb-2 px-6 cursor-pointer flex flex-col items-center shrink-0">
