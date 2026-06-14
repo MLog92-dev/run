@@ -70,18 +70,12 @@
 
         /* Resolves iOS PWA viewport bounds to stretch completely behind the home indicator */
         html, body {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
             width: 100%;
             height: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
             -webkit-overflow-scrolling: touch;
-            background-color: #f3f4f6; /* Light mode base background */
         }
 
         /* Hide default number input arrows */
@@ -105,7 +99,6 @@
         }
 
         @media (prefers-color-scheme: dark) {
-            html, body { background-color: #111827; /* Dark mode base background */ }
             input[type=range]::-webkit-slider-runnable-track { background: #374151; }
             input[type=range]::-webkit-slider-thumb { background: #d1d5db; }
             .toggle-checkbox { border-color: #4b5563; }
@@ -113,10 +106,10 @@
         }
     </style>
 </head>
-<body class="overflow-hidden font-sans text-gray-900 dark:text-gray-100 antialiased">
+<body class="overflow-hidden bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 antialiased">
 
     <!-- Map Area -->
-    <div id="map" class="absolute inset-0 z-0 h-full w-full"></div>
+    <div id="map" class="fixed inset-0 z-0 h-full w-full"></div>
 
     <!-- Notification / Status Banner -->
     <div id="status-bar" class="fixed top-[calc(1rem+env(safe-area-inset-top,0px))] left-4 right-4 z-20 flex justify-center pointer-events-none transition-all duration-300 opacity-0 transform -translate-y-2">
@@ -131,7 +124,7 @@
     </button>
 
     <!-- Slide-up Bottom Control Panel -->
-    <div id="control-panel" class="absolute bottom-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 transform translate-y-0 flex flex-col max-h-[82dvh]">
+    <div id="control-panel" class="fixed bottom-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 transform translate-y-0 flex flex-col max-h-[82dvh]" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
         
         <!-- Toggle Header (Drag Bar and quick metrics) -->
         <div id="panel-header" class="pt-4 pb-2 px-6 cursor-pointer flex flex-col items-center shrink-0">
@@ -308,8 +301,8 @@
             </div>
         </div>
 
-        <!-- Persistent Generate Button (Using explicit safe area padding directly on the wrapper) -->
-        <div class="px-6 pt-2 shrink-0 w-full" style="padding-bottom: max(12px, env(safe-area-inset-bottom));">
+        <!-- Persistent Generate Button (Safe area handled by parent padding) -->
+        <div class="px-6 pb-4 pt-2 shrink-0 w-full">
             <button id="btn-generate" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-4 px-4 rounded-2xl shadow-lg transition duration-150 flex justify-center items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 Find Route
