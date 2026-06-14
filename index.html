@@ -68,7 +68,20 @@
             transition: all 0.2s ease;
         }
 
-        html, body { width: 100%; height: 100vh; height: 100dvh; margin: 0; padding: 0; background-color: #000; overflow: hidden; }
+        /* Lock html/body to fixed size to prevent mobile browser drag/bounce and PWA resize black bars on resume */
+        html, body { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            height: 100dvh; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #000; 
+            overflow: hidden; 
+            -webkit-overflow-scrolling: auto;
+        }
         
         /* Dynamic iOS safe area subtraction to pull button closer to Home Indicator bar */
         .controls-panel {
@@ -121,7 +134,8 @@
     </button>
 
     <!-- Slide-up Bottom Control Panel -->
-    <div id="control-panel" class="fixed bottom-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] controls-panel border-t border-gray-100 dark:border-gray-800 transition-all duration-300 transform translate-y-0 flex flex-col max-h-[90vh]">
+    <!-- Constraining the max-height strictly below the Safe Area/Dynamic Island using calc() to resolve overlapping -->
+    <div id="control-panel" class="fixed bottom-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] controls-panel border-t border-gray-100 dark:border-gray-800 transition-all duration-300 transform translate-y-0 flex flex-col max-h-[calc(100dvh-env(safe-area-inset-top,47px)-24px)]">
         
         <!-- Toggle Header (Drag Bar and quick metrics) -->
         <div id="panel-header" class="pt-4 pb-2 px-6 cursor-pointer flex flex-col items-center shrink-0">
@@ -385,6 +399,23 @@
             'topo': { url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', class: '' }
         };
 
+        // Force fully recalculate heights of html/body viewport elements to squash the PWA resume black bars
+        function forceViewportFix() {
+            window.scrollTo(0, 0);
+            document.documentElement.style.height = window.innerHeight + 'px';
+            document.body.style.height = window.innerHeight + 'px';
+            if (map) {
+                map.invalidateSize();
+            }
+        }
+        window.addEventListener('resize', forceViewportFix);
+        window.addEventListener('focus', forceViewportFix);
+        window.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                forceViewportFix();
+            }
+        });
+
         // Initialize Chart.js global text color for dark mode
         Chart.defaults.color = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#9ca3af' : '#6b7280';
 
@@ -423,6 +454,7 @@
             });
 
             getUserLocation();
+            forceViewportFix();
         }
 
         // Tab Navigation Logic
@@ -816,6 +848,7 @@
                 markers.push(L.marker(end, { icon: endIcon }).addTo(map));
             }
 
+            // Set padding top to a large value (100px) so the route centers lower than the safe-area/status bar
             map.fitBounds(routeLayer.getBounds(), {
                 paddingBottomRight: [0, 220], 
                 paddingTopLeft: [24, 100]
@@ -1039,60 +1072,6 @@
                 poiList.innerHTML = `<div class="text-xs text-gray-500 italic py-2">Could not load POIs.</div>`;
             }
         }
-
-        btnExportGpx.addEventListener('click', () => {
-            if (!routeLayer) {
-                showStatus("Generate a route first to export.", true);
-                return;
-            }
-
-            const geoJSON = routeLayer.toGeoJSON();
-            let coords = [];
-            
-            if (geoJSON.type === 'FeatureCollection') {
-                geoJSON.features.forEach(f => {
-                    if (f.geometry && f.geometry.type === 'LineString') {
-                        coords = coords.concat(f.geometry.coordinates);
-                    }
-                });
-            } else if (geoJSON.type === 'Feature' && geoJSON.geometry.type === 'LineString') {
-                coords = geoJSON.geometry.coordinates;
-            } else if (geoJSON.type === 'LineString') {
-                coords = geoJSON.coordinates;
-            }
-
-            if (coords.length === 0) {
-                showStatus("No coordinate data found.", true);
-                return;
-            }
-
-            let gpx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-            gpx += `<gpx version="1.1" creator="Run Route Finder">\n`;
-            gpx += `  <trk>\n    <name>Run Route</name>\n    <trkseg>\n`;
-            
-            coords.forEach(c => {
-                gpx += `      <trkpt lat="${c[1]}" lon="${c[0]}"></trkpt>\n`;
-            });
-            
-            gpx += `    </trkseg>\n  </trk>\n</gpx>`;
-
-            const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `route_${new Date().toISOString().slice(0,10)}.gpx`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showStatus("GPX file downloaded.", false);
-        });
-
-        btnResetApp.addEventListener('click', () => {
-            window.location.href = window.location.pathname + '?reset=' + Date.now();
-        });
 
         window.addEventListener('DOMContentLoaded', initMap);
     </script>
